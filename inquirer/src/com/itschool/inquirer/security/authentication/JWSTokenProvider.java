@@ -73,7 +73,15 @@ public class JWSTokenProvider implements Token.Provider<JWSToken> {
 
     @Override
     public JWSToken renew(Account account, JWSToken renewToken) {
-        return issue(account);
+    	IdentityManager identityManager = getIdentityManager();
+        TokenCredentialStorage tokenStorage = getCurrentToken(account, identityManager);
+
+        if (tokenStorage.getToken().equals(renewToken.getToken())) {
+            invalidate(account);
+            return issue(account);
+        }
+        
+        return null;
     }
 
     @Override
@@ -101,4 +109,9 @@ public class JWSTokenProvider implements Token.Provider<JWSToken> {
     private IdentityManager getIdentityManager() {
         return this.partitionManager.createIdentityManager(getPartition());
     }
+    
+    private TokenCredentialStorage getCurrentToken(Account account, IdentityManager identityManager) {
+        return identityManager.retrieveCurrentCredential(account, TokenCredentialStorage.class);
+    }
+
 }

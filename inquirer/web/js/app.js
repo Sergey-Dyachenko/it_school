@@ -16,8 +16,8 @@
  */
 // Define top level routes for the app, security related views are declated in the security.js
 // Note that this app is a single page app, and each partial is routed to using the URL fragment. For example, to select the 'home' route, the URL is http://localhost:8080/Project/#/home
-var appModule = angular.module('PLAngular',
-	[ 'MessageModule', 'PicketLinkSecurityModule']).config(
+var appModule = angular.module('InquirerApp',
+	[ 'MessageModule', 'SecurityModule']).config(
 	[ '$routeProvider', function($routeProvider) {
 	    $routeProvider.when('/home', {
 		templateUrl : 'partials/home.html',

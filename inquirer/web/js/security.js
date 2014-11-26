@@ -1,4 +1,4 @@
-angular.module('PicketLinkSecurityModule', ['ngResource', 'ngRoute']).config(
+angular.module('SecurityModule', ['ngResource', 'ngRoute']).config(
     [ '$routeProvider', function($routeProvider) {
         $routeProvider.when('/login', {
             templateUrl : 'partials/login.html',
@@ -30,32 +30,32 @@ angular.module('PicketLinkSecurityModule', ['ngResource', 'ngRoute']).config(
             }
         });
     } ])
-    .factory('LoginResource', ['$resource', function($resource) {
+    .factory('LoginResource', function($resource) {
         return function(newUser) {
-            return $resource('/#/private/:dest', {}, {
-            login: {method: 'POST', params: {dest:"authc"}, headers:{"Authorization": "Basic " + btoa(newUser.userId + ":" + newUser.password)} },
+            return $resource('rs/private/:dest', {}, {
+            login: {method: 'POST', params: {dest:"authenticate"}, headers:{"Authorization": "Basic " + btoa(newUser.userId + ":" + newUser.password)} },
         });
-    }}])
-    .factory('LogoutResource', ['$resource', function($resource) {
-        return $resource('/#/private/:dest', {}, {
+    }})
+    .factory('LogoutResource', function($resource) {
+        return $resource('rs/private/:dest', {}, {
             logout: {method: 'POST', params: {dest:"logout"}}
         });
-        }])
-     .factory('AdminResource', ['$resource', function($resource) {
-        return $resource('/#/private/account/:dest', {}, {
+        })
+     .factory('AdminResource', function($resource) {
+        return $resource('rs/private/account/:dest', {}, {
             enableAccount: {method: 'POST', params: {dest:"enableAccount"}},
             disableAccount: {method: 'POST', params: {dest:"disableAccount"}}
         });
-    }])
-    .factory('UsersResource', ['$resource', function($resource) {
-        return $resource('/#/private/person/:dest', {}, {});
-    }])
-    .factory('RegistrationResource', ['$resource', function($resource) {
-        return $resource('/#/register/:dest', {}, {
+    })
+    .factory('UsersResource', function($resource) {
+        return $resource('rs/private/person/:dest', {}, {});
+    })
+    .factory('RegistrationResource', function($resource) {
+        return $resource('rs/register/:dest', {}, {
             activation: {method: 'POST', params: {dest:"activation"}}
         });
-    }])
-    .factory('SecurityService', ['$rootScope', function($rootScope) {
+    })
+    .factory('SecurityService', function($rootScope) {
 
         var SecurityService = function() {
             var userName, password;
@@ -90,7 +90,7 @@ angular.module('PicketLinkSecurityModule', ['ngResource', 'ngRoute']).config(
         };
 
         return new SecurityService();
-    }]);
+    });
 
 // controllers definition
 function LoginCtrl($scope, LoginResource, SecurityService, $location, $rootScope) {
@@ -100,8 +100,15 @@ function LoginCtrl($scope, LoginResource, SecurityService, $location, $rootScope
         if ($scope.newUser.userId != undefined && $scope.newUser.password != undefined) {
             LoginResource($scope.newUser).login($scope.newUser,
                 function (data) {
-                    SecurityService.initSession(data);
-                    $location.path( "/home" );
+            		var token = data.authctoken;
+            		
+            		if(token != null && token != '' && token != 'undefined') {
+	                    SecurityService.initSession(data);
+	                    $location.path( "/home" );
+            		} else {
+            			$scope.newUser.password = undefined;
+            			$rootScope.messages = ["Authorization failed ! Please, check your login / password ... "];
+            		}
                 }
             );
         }

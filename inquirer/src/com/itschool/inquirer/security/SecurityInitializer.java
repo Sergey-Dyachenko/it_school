@@ -118,8 +118,8 @@ public class SecurityInitializer {
 
         User admin = new User(email);
         Profile profile = new Profile();
-        profile.setFirstName("Almight");
-        profile.setLastName("Administrator");
+        profile.setFirstname("Almight");
+        profile.setLastname("Administrator");
         admin.setProfile(profile);
 
         identityManager.add(admin);

@@ -2,6 +2,7 @@ package com.itschool.inquirer.security.service;
 
 import org.picketlink.idm.credential.Token;
 
+import com.itschool.inquirer.Constants;
 import com.itschool.inquirer.model.Email;
 import com.itschool.inquirer.security.model.AccountManager;
 import com.itschool.inquirer.security.model.User;
@@ -80,8 +81,19 @@ public class RegistrationService {
 
 
     private void sendNotification(UserRegistration request, String activationCode) {
-        Email email = new Email("Please complete the signup", "http://localhost:8080/picketlink-angularjs-rest/#/activate/" + activationCode, request.getEmail());
+		StringBuilder sb = new StringBuilder();
+		sb.append("Dear, ");
+		sb.append(request.getFirstname());
+		sb.append(" ");
+		sb.append(request.getLastname());
+		sb.append("!<br/><br/>You have registered on Inquirer Service. For access to full functionality you have to activate your account.<br/><br/>Please, click <a href=\"");
+		sb.append(Constants.ROOT_PATH);
+		sb.append("/rs/activate/");
+		sb.append(activationCode);
+		sb.append("\">activation link</a><br/><br/>--------------------------------------------------<br/><br/>Best regards, MyWay Team.");
 
-        event.fire(email);
+		Email email = new Email("OASA Portal registration", sb.toString(),
+				request.getEmail());
+		event.fire(email);
     }
 }

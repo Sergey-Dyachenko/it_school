@@ -17,12 +17,12 @@ public class Profile {
 	private Long id;
 
 	@Column(nullable = false)
-	private String firstName;
+	private String firstname;
 
 	private String surname;
 
 	@Column(nullable = false)
-	private String lastName;
+	private String lastname;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date birthDay;
@@ -39,12 +39,12 @@ public class Profile {
 		this.id = id;
 	}
 
-	public String getFirstName() {
-		return firstName;
+	public String getFirstname() {
+		return firstname;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
 	}
 
 	public String getSurname() {
@@ -55,12 +55,12 @@ public class Profile {
 		this.surname = surname;
 	}
 
-	public String getLastName() {
-		return lastName;
+	public String getLastname() {
+		return lastname;
 	}
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
 	}
 
 	public Date getBirthDay() {

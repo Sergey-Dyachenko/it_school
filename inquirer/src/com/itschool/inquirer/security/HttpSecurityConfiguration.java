@@ -45,10 +45,9 @@ public class HttpSecurityConfiguration {
             .identity()
                 .stateless()
             .http()
-                .forPath("/#/private/*")
+                .forPath("/rs/private/*")
                     .authenticateWith()
-                        .token();
-        
+                        .token();        
     }
 
 }

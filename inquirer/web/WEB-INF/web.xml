@@ -21,7 +21,7 @@
   </context-param>
   <context-param>
     <param-name>resteasy.servlet.mapping.prefix</param-name>
-    <param-value>/#</param-value>
+    <param-value>/rs</param-value>
   </context-param>
   <listener>
     <listener-class>
@@ -34,6 +34,6 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>resteasy-servlet</servlet-name>
-    <url-pattern>/#/*</url-pattern>
+    <url-pattern>/rs/*</url-pattern>
   </servlet-mapping>
 </web-app>

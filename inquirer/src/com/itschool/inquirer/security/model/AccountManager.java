@@ -40,9 +40,9 @@ public class AccountManager {
 
         User newUser = new User(request.getEmail());
         Profile profile = new Profile();
-        profile.setFirstName(request.getFirstName());
+        profile.setFirstname(request.getFirstname());
         profile.setSurname(request.getSurname());
-        profile.setLastName(request.getLastName());
+        profile.setLastname(request.getLastname());
         profile.setBirthDay(request.getBirthDay());
         newUser.setProfile(profile);
 
@@ -63,13 +63,13 @@ public class AccountManager {
         this.identityManager.updateCredential(account, new Password(password));
     }
 
-    public void grantRole(User account, String roleName) {
-        Role storedRole = BasicModel.getRole(this.identityManager, roleName);
+    public void grantRole(User account, String rolename) {
+        Role storedRole = BasicModel.getRole(this.identityManager, rolename);
         BasicModel.grantRole(this.relationshipManager, account, storedRole);
     }
 
-    public boolean hasRole(User account, String roleName) {
-        Role storedRole = BasicModel.getRole(this.identityManager, roleName);
+    public boolean hasRole(User account, String rolename) {
+        Role storedRole = BasicModel.getRole(this.identityManager, rolename);
         return BasicModel.hasRole(this.relationshipManager, account, storedRole);
     }
 
@@ -88,8 +88,8 @@ public class AccountManager {
         return this.tokenProvider.issue(user);
     }
 
-    public User findByLoginName(String loginName) {
-        if (loginName == null) {
+    public User findByLoginName(String loginname) {
+        if (loginname == null) {
             throw new IllegalArgumentException("Invalid login name.");
         }
 
@@ -97,7 +97,7 @@ public class AccountManager {
         @SuppressWarnings("unchecked")
 		IdentityQuery<User> query = queryBuilder.createIdentityQuery(User.class);
 
-        query.where(queryBuilder.equal(User.LOGIN, loginName));
+        query.where(queryBuilder.equal(User.LOGIN, loginname));
 
         List<User> result = query.getResultList();
 
