@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure>
+	<deployment>
+		<dependencies>
+			<module name="org.picketlink" meta-inf="import"/>
+			<module name="org.picketlink.core" meta-inf="import"/>
+			<module name="org.picketlink.core.api" meta-inf="import"/>
+			<module name="org.picketlink.idm" meta-inf="import"/>
+			<module name="org.picketlink.idm.api" meta-inf="import"/>
+			<module name="org.picketlink.idm.schema" meta-inf="import"/>
+		</dependencies>
+	</deployment>
+</jboss-deployment-structure>

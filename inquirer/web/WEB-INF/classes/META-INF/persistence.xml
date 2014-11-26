@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://java.sun.com/xml/ns/persistence
+        http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+	<persistence-unit name="DAISInquirer" transaction-type="JTA">
+		<jta-data-source>java:jboss/datasources/DAISInquirer</jta-data-source>
+		
+		<class>com.itschool.inquirer.security.model.entity.UserEntity</class>
+		<class>org.picketlink.idm.jpa.model.sample.simple.AttributedTypeEntity</class>
+		<class>org.picketlink.idm.jpa.model.sample.simple.RoleTypeEntity</class>
+		<class>org.picketlink.idm.jpa.model.sample.simple.GroupTypeEntity</class>
+		<class>org.picketlink.idm.jpa.model.sample.simple.IdentityTypeEntity</class>
+		<class>org.picketlink.idm.jpa.model.sample.simple.RelationshipTypeEntity</class>
+		<class>org.picketlink.idm.jpa.model.sample.simple.RelationshipIdentityTypeEntity</class>
+		<class>org.picketlink.idm.jpa.model.sample.simple.PartitionTypeEntity</class>
+		<class>org.picketlink.idm.jpa.model.sample.simple.AttributeTypeEntity</class>
+		<class>org.picketlink.idm.jpa.model.sample.simple.PasswordCredentialTypeEntity</class>
+        <class>org.picketlink.idm.jpa.model.sample.simple.TokenCredentialTypeEntity</class>
+        
+		<properties>
+			<!-- Properties for Hibernate -->
+			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
+			<property name="hibernate.current_session_context_class"
+				value="thread" />
+			<property name="hibernate.cache.use_second_level_cache"
+				value="true" />
+			<property name="hibernate.default_schema" value="public"/>
+			<property name="hibernate.cache.use_query_cache" value="true" />
+			<property name="hibernate.connection.autocommit" value="true"/>
+			<property name="hibernate.hbm2ddl.auto" value="update"/>
+			<property name="hibernate.show_sql" value="true" />
+		</properties>
+	</persistence-unit>
+</persistence>
