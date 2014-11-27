@@ -11,13 +11,13 @@ import org.picketlink.idm.query.AttributeParameter;
 import org.picketlink.idm.query.QueryParameter;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.itschool.inquirer.model.Profile;
+import com.itschool.inquirer.model.entity.Profile;
 
 import static org.picketlink.idm.model.annotation.IdentityStereotype.Stereotype.USER;
 import static org.picketlink.idm.model.annotation.StereotypeProperty.Property.IDENTITY_USER_NAME;
 
 @IdentityStereotype(USER)
-@JsonIgnoreProperties({"activationCode"})
+@JsonIgnoreProperties({"activationCode", "partition"})
 public class User extends AbstractIdentityType implements Account {
 
 	private static final long serialVersionUID = 1L;

@@ -13,8 +13,8 @@ import org.picketlink.idm.model.basic.Realm;
 import org.picketlink.idm.model.basic.Role;
 
 import com.itschool.inquirer.Constants;
-import com.itschool.inquirer.model.Profile;
-import com.itschool.inquirer.security.model.AccountManager;
+import com.itschool.inquirer.model.entity.Profile;
+import com.itschool.inquirer.security.bean.AccountManager;
 import com.itschool.inquirer.security.model.User;
 
 import javax.annotation.PostConstruct;

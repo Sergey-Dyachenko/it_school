@@ -1,8 +1,11 @@
 package com.itschool.inquirer.security.service;
 
+import org.picketlink.authorization.annotations.LoggedIn;
 import org.picketlink.authorization.annotations.RolesAllowed;
+import org.picketlink.idm.credential.Token;
 
-import com.itschool.inquirer.security.model.AccountManager;
+import com.itschool.inquirer.security.authentication.JWSToken;
+import com.itschool.inquirer.security.bean.AccountManager;
 import com.itschool.inquirer.security.model.User;
 import com.itschool.inquirer.util.MessageBuilder;
 
@@ -17,12 +20,16 @@ import javax.ws.rs.core.Response;
 import static com.itschool.inquirer.model.AppRole.ADMIN;
 
 @Stateless
-@Path("/private/account")
+@LoggedIn
+@Path("/private/admin/account")
 @RolesAllowed(ADMIN)
 public class AccountService {
 
     @Inject
     private AccountManager identityModelManager;
+    
+    @Inject
+    private Token.Provider<JWSToken> tokenProvider;
     
     @POST
     @Path("enableAccount")
@@ -60,6 +67,7 @@ public class AccountService {
         }
 
         this.identityModelManager.disableAccount(user);
+        this.tokenProvider.invalidate(user);
 
         return MessageBuilder.ok().message("Account is now disabled.").build();
     }

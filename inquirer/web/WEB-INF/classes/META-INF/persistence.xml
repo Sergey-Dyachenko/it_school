@@ -7,6 +7,7 @@
 	<persistence-unit name="DAISInquirer" transaction-type="JTA">
 		<jta-data-source>java:jboss/datasources/DAISInquirer</jta-data-source>
 		
+		<!-- SECURITY SECTION -->
 		<class>com.itschool.inquirer.security.model.entity.UserEntity</class>
 		<class>org.picketlink.idm.jpa.model.sample.simple.AttributedTypeEntity</class>
 		<class>org.picketlink.idm.jpa.model.sample.simple.RoleTypeEntity</class>
@@ -18,6 +19,15 @@
 		<class>org.picketlink.idm.jpa.model.sample.simple.AttributeTypeEntity</class>
 		<class>org.picketlink.idm.jpa.model.sample.simple.PasswordCredentialTypeEntity</class>
         <class>org.picketlink.idm.jpa.model.sample.simple.TokenCredentialTypeEntity</class>
+        
+        <!-- INQUIRER SECTION -->
+        <class>com.itschool.inquirer.model.entity.Category</class>
+        <class>com.itschool.inquirer.model.entity.Inquirer</class>
+        <class>com.itschool.inquirer.model.entity.Question</class>
+        <class>com.itschool.inquirer.model.entity.Item</class>
+        <class>com.itschool.inquirer.model.entity.Answer</class>
+        <class>com.itschool.inquirer.model.entity.UserAnswer</class>
+        <class>com.itschool.inquirer.model.entity.ResultSet</class>
         
 		<properties>
 			<!-- Properties for Hibernate -->

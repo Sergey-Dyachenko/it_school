@@ -5,7 +5,7 @@ import org.picketlink.idm.jpa.annotations.entity.IdentityManaged;
 import org.picketlink.idm.jpa.model.sample.simple.IdentityTypeEntity;
 import org.picketlink.idm.model.annotation.AttributeProperty;
 
-import com.itschool.inquirer.model.Profile;
+import com.itschool.inquirer.model.entity.Profile;
 import com.itschool.inquirer.security.model.User;
 
 import javax.persistence.CascadeType;

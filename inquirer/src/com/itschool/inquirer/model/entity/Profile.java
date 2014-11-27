@@ -1,4 +1,4 @@
-package com.itschool.inquirer.model;
+package com.itschool.inquirer.model.entity;
 
 import java.util.Date;
 

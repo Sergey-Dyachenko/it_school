@@ -1,17 +1,26 @@
-package com.itschool.inquirer.security.model;
+package com.itschool.inquirer.security.bean;
 
+import org.picketlink.Identity;
+import org.picketlink.Identity.AuthenticationResult;
+import org.picketlink.credential.DefaultLoginCredentials;
+import org.picketlink.http.AccessDeniedException;
 import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.RelationshipManager;
 import org.picketlink.idm.credential.Password;
 import org.picketlink.idm.credential.Token;
 import org.picketlink.idm.model.Account;
 import org.picketlink.idm.model.basic.BasicModel;
+import org.picketlink.idm.model.basic.Grant;
 import org.picketlink.idm.model.basic.Role;
 import org.picketlink.idm.query.IdentityQuery;
 import org.picketlink.idm.query.IdentityQueryBuilder;
+import org.picketlink.idm.query.RelationshipQuery;
 
-import com.itschool.inquirer.model.Profile;
+import com.itschool.inquirer.model.AuthAccessElement;
+import com.itschool.inquirer.model.entity.Profile;
 import com.itschool.inquirer.security.authentication.JWSToken;
+import com.itschool.inquirer.security.model.User;
+import com.itschool.inquirer.security.model.UserRegistration;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -24,6 +33,12 @@ import static com.itschool.inquirer.model.AppRole.ADMIN;
 @Stateless
 public class AccountManager {
 
+	@Inject
+	private Identity identity;
+	
+	@Inject
+	private DefaultLoginCredentials credential;
+	
     @Inject
     private IdentityManager identityManager;
 
@@ -32,6 +47,27 @@ public class AccountManager {
 
     @Inject
     private Token.Provider<JWSToken> tokenProvider;
+    
+    public AuthAccessElement login(DefaultLoginCredentials credential) throws Exception {
+		if (!this.identity.isLoggedIn()) {
+			this.credential.setUserId(credential.getUserId());
+			this.credential.setPassword(credential.getPassword());
+			
+			AuthenticationResult res = identity.login();
+
+			if (res.equals(AuthenticationResult.SUCCESS)) {
+				Account account = this.identity.getAccount();
+				Token token = tokenProvider.issue(account);
+				Role role = getRole(account);
+				
+				identityManager.updateCredential(account, token);
+
+				return new AuthAccessElement(account.getId(), token.getToken(), role.getName());
+			} else
+				throw new AccessDeniedException("Authorization failed! Please, check your login / password.");
+		}
+		throw new AccessDeniedException("User has been already logged in.");
+    }
 
     public User createAccount(UserRegistration request) {
         if (!request.isValid()) {
@@ -71,6 +107,19 @@ public class AccountManager {
     public boolean hasRole(User account, String rolename) {
         Role storedRole = BasicModel.getRole(this.identityManager, rolename);
         return BasicModel.hasRole(this.relationshipManager, account, storedRole);
+    }
+    
+    public Role getRole(Account account) {
+        RelationshipQuery<Grant> query = relationshipManager.createRelationshipQuery(Grant.class);
+
+        query.setParameter(Grant.ASSIGNEE, account);
+
+        List<Grant> g = query.getResultList();
+        
+        if(g.size() == 0)
+        	return null;
+        else
+        	return g.get(0).getRole();
     }
 
     public Token activateAccount(String activationCode) {

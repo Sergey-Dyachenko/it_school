@@ -8,6 +8,7 @@
 			<module name="org.picketlink.idm" meta-inf="import"/>
 			<module name="org.picketlink.idm.api" meta-inf="import"/>
 			<module name="org.picketlink.idm.schema" meta-inf="import"/>
+			<module name="org.picketlink.idm.schema" meta-inf="import"/>
 		</dependencies>
 	</deployment>
 </jboss-deployment-structure>

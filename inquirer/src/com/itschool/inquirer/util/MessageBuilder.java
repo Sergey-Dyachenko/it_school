@@ -49,13 +49,14 @@ public class MessageBuilder {
         }
 
         actualMessages.addAll(Arrays.asList(message));
-
+    	
         return this;
     }
     
-    public MessageBuilder message(Object entity) {
-        this.messageData.put(ENTITY, entity);
+    public MessageBuilder message(Object... message) {
 
+    	this.messageData.put(ENTITY, message[0]);
+    	
         return this;
     }
 

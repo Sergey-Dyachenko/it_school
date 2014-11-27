@@ -4,7 +4,7 @@ import org.picketlink.idm.credential.Token;
 
 import com.itschool.inquirer.Constants;
 import com.itschool.inquirer.model.Email;
-import com.itschool.inquirer.security.model.AccountManager;
+import com.itschool.inquirer.security.bean.AccountManager;
 import com.itschool.inquirer.security.model.User;
 import com.itschool.inquirer.security.model.UserRegistration;
 import com.itschool.inquirer.util.MessageBuilder;

@@ -19,35 +19,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.itschool.inquirer.security;
 
-import org.picketlink.config.SecurityConfigurationBuilder;
-import org.picketlink.event.SecurityConfigurationEvent;
+package com.itschool.inquirer.security.service;
 
-import javax.enterprise.event.Observes;
+import org.picketlink.credential.DefaultLoginCredentials;
+
+import com.itschool.inquirer.model.AuthAccessElement;
+import com.itschool.inquirer.security.bean.AccountManager;
+
+import javax.annotation.security.PermitAll;
+import javax.inject.Inject;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 /**
- * <p>A simple CDI observer for the {@link org.picketlink.event.SecurityConfigurationEvent}.</p>
  *
- * <p>The event is fired during application startup and allows you to provide any configuration to PicketLink
- * before it is initialized.</p>
- *
- * <p>All the configuration related with Http Security is provided from this bean.</p>
- *
- * @author Pedro Igor
  */
-public class HttpSecurityConfiguration {
+@Path("/private/login")
+@Produces(MediaType.APPLICATION_JSON)
+public class LoginService {
 
-    public void onInit(@Observes SecurityConfigurationEvent event) {
-        SecurityConfigurationBuilder builder = event.getBuilder();
+	@Inject
+	private AccountManager accountManager;
 
-        builder
-            .identity()
-                .stateless()
-            /*.http()
-            	.forPath("/rest/private/*")
-            		.authenticateWith()
-            		.token()*/;        
-    }
 
+
+	@POST
+	@PermitAll
+	public AuthAccessElement login(DefaultLoginCredentials credential) throws Exception {
+        return accountManager.login(credential);
+	}
 }

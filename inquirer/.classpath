@@ -13,8 +13,8 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Jackson"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Picketlink"/>
 	<classpathentry kind="lib" path="D:/Servers/wildfly/modules/system/layers/base/org/glassfish/javax/json/main/javax.json-1.0.3.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Jackson"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
