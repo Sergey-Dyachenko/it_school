@@ -116,7 +116,7 @@ public class SecurityInitializer {
             return;
         }
 
-        User admin = new User(email);
+        User admin = new User("admin");
         Profile profile = new Profile();
         profile.setFirstname("Almight");
         profile.setLastname("Administrator");
