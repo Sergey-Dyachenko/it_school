@@ -9,13 +9,15 @@ import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.PartitionManager;
 import org.picketlink.idm.config.SecurityConfigurationException;
 import org.picketlink.idm.model.Attribute;
+import org.picketlink.idm.model.Partition;
 import org.picketlink.idm.model.basic.Realm;
-import org.picketlink.idm.model.basic.Role;
 
 import com.itschool.inquirer.Constants;
 import com.itschool.inquirer.model.entity.Profile;
-import com.itschool.inquirer.security.bean.AccountManager;
-import com.itschool.inquirer.security.model.User;
+import com.itschool.inquirer.model.security.Role;
+import com.itschool.inquirer.model.security.User;
+import com.itschool.inquirer.security.bean.RoleManager;
+import com.itschool.inquirer.security.bean.UserManager;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -23,9 +25,8 @@ import javax.ejb.Startup;
 import javax.faces.bean.ApplicationScoped;
 import javax.inject.Inject;
 
-import static org.picketlink.idm.model.basic.BasicModel.getRole;
-import static com.itschool.inquirer.model.AppRole.ADMIN;
-import static com.itschool.inquirer.model.AppRole.USER;
+import static com.itschool.inquirer.model.AppRoles.ADMIN;
+import static com.itschool.inquirer.model.AppRoles.USER;
 
 @Singleton
 @Startup
@@ -37,7 +38,10 @@ public class SecurityInitializer {
     private KeyStore keyStore;
     
     @Inject
-    private AccountManager identityModelManager;
+    private UserManager userManager;
+    
+    @Inject
+    private RoleManager roleManager;
 
     @Inject
     private PartitionManager partitionManager;    
@@ -50,7 +54,7 @@ public class SecurityInitializer {
     }
     
     public void createDefaultPartition() {
-        Realm partition = partitionManager.getPartition(Realm.class, Realm.DEFAULT_REALM);
+    	Partition partition = partitionManager.getPartition(Partition.class, Realm.DEFAULT_REALM);
 
         try {
 	        if (partition == null) {
@@ -76,7 +80,7 @@ public class SecurityInitializer {
     }
 
     private Role createRole(String roleName, IdentityManager identityManager) {
-        Role role = getRole(identityManager, roleName);
+        Role role = roleManager.getRoleByName(roleName);
 
         if (role == null) {
             role = new Role(roleName);
@@ -108,24 +112,22 @@ public class SecurityInitializer {
     }
 
     private void createAdminAccount() {
-        IdentityManager identityManager = partitionManager.createIdentityManager();
-        String email = Constants.ADMIN_EMAIL;
+
+    	String email = Constants.ADMIN_EMAIL;
 
         // if admin exists dont create again
-        if(identityModelManager.findByLoginName(email) != null) {
+        if(userManager.getUserByLogin(email) != null) {
             return;
         }
 
-        User admin = new User("admin");
+        User admin = new User(email);
         Profile profile = new Profile();
         profile.setFirstname("Almight");
         profile.setLastname("Administrator");
         admin.setProfile(profile);
 
-        identityManager.add(admin);
-
-        identityModelManager.updatePassword(admin, "admin");
+        userManager.save(admin);
         
-        identityModelManager.grantRole(admin, ADMIN);
+        roleManager.grantRole(admin.getId(), ADMIN);
     }
 }

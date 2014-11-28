@@ -8,17 +8,9 @@
 		<jta-data-source>java:jboss/datasources/DAISInquirer</jta-data-source>
 		
 		<!-- SECURITY SECTION -->
-		<class>com.itschool.inquirer.security.model.entity.UserEntity</class>
-		<class>org.picketlink.idm.jpa.model.sample.simple.AttributedTypeEntity</class>
-		<class>org.picketlink.idm.jpa.model.sample.simple.RoleTypeEntity</class>
-		<class>org.picketlink.idm.jpa.model.sample.simple.GroupTypeEntity</class>
-		<class>org.picketlink.idm.jpa.model.sample.simple.IdentityTypeEntity</class>
-		<class>org.picketlink.idm.jpa.model.sample.simple.RelationshipTypeEntity</class>
-		<class>org.picketlink.idm.jpa.model.sample.simple.RelationshipIdentityTypeEntity</class>
 		<class>org.picketlink.idm.jpa.model.sample.simple.PartitionTypeEntity</class>
-		<class>org.picketlink.idm.jpa.model.sample.simple.AttributeTypeEntity</class>
-		<class>org.picketlink.idm.jpa.model.sample.simple.PasswordCredentialTypeEntity</class>
-        <class>org.picketlink.idm.jpa.model.sample.simple.TokenCredentialTypeEntity</class>
+		<class>org.picketlink.idm.jpa.model.sample.simple.IdentityTypeEntity</class>
+		<class>com.itschool.inquirer.model.entity.security.Session</class>
         
         <!-- INQUIRER SECTION -->
         <class>com.itschool.inquirer.model.entity.Category</class>
@@ -39,7 +31,7 @@
 			<property name="hibernate.default_schema" value="public"/>
 			<property name="hibernate.cache.use_query_cache" value="true" />
 			<property name="hibernate.connection.autocommit" value="true"/>
-			<property name="hibernate.hbm2ddl.auto" value="update"/>
+			<property name="hibernate.hbm2ddl.auto" value="create-drop"/>
 			<property name="hibernate.show_sql" value="true" />
 		</properties>
 	</persistence-unit>

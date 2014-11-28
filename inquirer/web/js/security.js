@@ -95,7 +95,7 @@ angular.module('SecurityModule', ['ngResource', 'ngRoute']).config(
 	    .factory('LoginResource', function($resource) {
 	        return function(newUser) {
 	            return $resource('rest/private/:dest', {}, {
-	            login: {method: 'POST', params: {dest:"login"}, headers:{"Authorization": "Basic " + btoa(newUser.userId + ":" + newUser.password), "X-Requested-With": "XMLHttpRequest"} },
+	            login: {method: 'POST', params: {dest:"authc"}, headers:{"Authorization": "Basic " + btoa(newUser.userId + ":" + newUser.password), "X-Requested-With": "XMLHttpRequest"} },
 	        });
 	    }})
 	    .factory('LogoutResource', function($resource) {
@@ -169,5 +169,5 @@ angular.module('SecurityModule', ['ngResource', 'ngRoute']).config(
 	    })
 	    .controller('LoginCtrl', LoginCtrl)
 	    .controller('LogoutCtrl', LogoutCtrl)
-	    .controller('SignupCtrl', LoginCtrl)
-	    .controller('ActivationCtrl', LoginCtrl);
+	    .controller('SignupCtrl', SignupCtrl)
+	    .controller('ActivationCtrl', ActivationCtrl);

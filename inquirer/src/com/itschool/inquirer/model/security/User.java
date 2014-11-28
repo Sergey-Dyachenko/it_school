@@ -1,4 +1,4 @@
-package com.itschool.inquirer.security.model;
+package com.itschool.inquirer.model.security;
 
 import org.picketlink.idm.jpa.annotations.AttributeValue;
 import org.picketlink.idm.model.AbstractIdentityType;

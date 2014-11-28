@@ -14,10 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.itschool.inquirer.security.util;
+package com.itschool.inquirer.service;
 
 import org.picketlink.Identity;
-import org.picketlink.http.AccessDeniedException;
 
 import com.itschool.inquirer.util.MessageBuilder;
 
@@ -53,7 +52,7 @@ public class RestExceptionMapper implements ExceptionMapper<Throwable> {
 
         MessageBuilder builder = null;
 
-        if (AccessDeniedException.class.isInstance(exception)) {
+        if (org.picketlink.http.AccessDeniedException.class.isInstance(exception)) {
             if (getIdentity().isLoggedIn()) {
                 builder = accessDenied();
             } else {
