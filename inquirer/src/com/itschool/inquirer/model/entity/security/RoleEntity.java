@@ -7,11 +7,13 @@ import org.picketlink.idm.jpa.annotations.AttributeValue;
 import org.picketlink.idm.jpa.annotations.entity.IdentityManaged;
 import org.picketlink.idm.jpa.model.sample.simple.IdentityTypeEntity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.itschool.inquirer.model.security.Role;
 
 @IdentityManaged(Role.class)
 @Entity
 @Table(name = "role")
+@JsonIgnoreProperties(ignoreUnknown = true, value = {"typeName"})
 public class RoleEntity extends IdentityTypeEntity {
  
     /**

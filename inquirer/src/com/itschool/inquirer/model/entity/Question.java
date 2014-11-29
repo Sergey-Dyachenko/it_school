@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.itschool.inquirer.Constants.QuestionType;
 
 @Entity
-@JsonIgnoreProperties({ "parent",  "answers", "items" })
+@JsonIgnoreProperties(ignoreUnknown = true, value = { "parent",  "answers", "items" })
 public class Question {
 
 	@Id

@@ -1,4 +1,4 @@
-package com.itschool.inquirer.security.bean;
+package com.itschool.inquirer.bean.security;
 
 import java.util.Date;
 

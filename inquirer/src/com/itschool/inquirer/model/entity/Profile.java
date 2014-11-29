@@ -1,15 +1,14 @@
 package com.itschool.inquirer.model.entity;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Profile {
 
 	@Id
@@ -23,9 +22,6 @@ public class Profile {
 
 	@Column(nullable = false)
 	private String lastname;
-
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date birthDay;
 	
 	public Profile() {
 		
@@ -61,14 +57,6 @@ public class Profile {
 
 	public void setLastname(String lastname) {
 		this.lastname = lastname;
-	}
-
-	public Date getBirthDay() {
-		return birthDay;
-	}
-
-	public void setBirthDay(Date birthDay) {
-		this.birthDay = birthDay;
 	}
 	
 }

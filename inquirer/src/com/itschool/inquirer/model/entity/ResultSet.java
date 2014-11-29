@@ -16,7 +16,7 @@ import javax.persistence.TemporalType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@JsonIgnoreProperties({ "results", "owner", "inqurer" })
+@JsonIgnoreProperties(ignoreUnknown = true, value = { "results", "owner", "inqurer" })
 public class ResultSet {
 
 	@Id

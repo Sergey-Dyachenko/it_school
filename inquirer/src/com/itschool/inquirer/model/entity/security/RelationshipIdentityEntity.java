@@ -13,9 +13,12 @@ import org.picketlink.idm.jpa.annotations.RelationshipDescriptor;
 import org.picketlink.idm.jpa.annotations.RelationshipMember;
 import org.picketlink.idm.jpa.annotations.entity.IdentityManaged;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @IdentityManaged({org.picketlink.idm.model.Relationship.class})
 @Entity
 @Table(name = "relationshipidentity")
+@JsonIgnoreProperties(ignoreUnknown = true, value = {"typeName"})
 public class RelationshipIdentityEntity implements Serializable {
 
 	/**

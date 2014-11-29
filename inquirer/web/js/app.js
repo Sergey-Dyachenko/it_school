@@ -58,8 +58,8 @@ var appModule = angular.module('InquirerApp',
                     console.log("Server Response Status: " + rejection.status);
                     console.log(rejection);
     
-                    if (rejection.data && rejection.data.message) {
-                        MessageService.setMessages(rejection.data.message);
+                    if (rejection.data && rejection.data.messages) {
+                        MessageService.setMessages(rejection.data.messages);
                     } else {
                         MessageService.setMessages(["Unexpected error from server."]);
                     }

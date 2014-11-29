@@ -12,9 +12,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 public class MessageBuilder {
 	
 	public static final String ENTITY = "entity";
-    public static final String MESSAGE_PARAMETER = "message";
-    public static final String ACTIVATION_CODE_PARAMETER = "activationCode";
-    public static final String TOKEN_PARAMETER = "token";
+    public static final String MESSAGE_PARAMETER = "messages";
 
 	private final ResponseBuilder response;
 	private final Map<String, Object> messageData = new HashMap<String, Object>();
@@ -57,16 +55,6 @@ public class MessageBuilder {
 
     	this.messageData.put(ENTITY, message[0]);
     	
-        return this;
-    }
-
-    public MessageBuilder activationCode(String activationCode) {
-        this.messageData.put(ACTIVATION_CODE_PARAMETER, activationCode);
-        return this;
-    }
-
-    public MessageBuilder token(String token) {
-        this.messageData.put(TOKEN_PARAMETER, token);
         return this;
     }
 

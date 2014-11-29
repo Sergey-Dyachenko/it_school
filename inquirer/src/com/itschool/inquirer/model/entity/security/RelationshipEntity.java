@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @Table(name = "relationship")
 @Inheritance(strategy = InheritanceType.JOINED)
-@JsonIgnoreProperties({"typeName"})
+@JsonIgnoreProperties(ignoreUnknown = true, value = {"typeName"})
 public class RelationshipEntity {
  
     @Identifier

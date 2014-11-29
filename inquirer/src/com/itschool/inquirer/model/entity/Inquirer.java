@@ -11,7 +11,7 @@ import javax.persistence.ManyToMany;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@JsonIgnoreProperties({ "questions" })
+@JsonIgnoreProperties(ignoreUnknown = true, value = { "questions" })
 public class Inquirer {
 
 	@Id

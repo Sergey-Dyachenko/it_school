@@ -1,4 +1,4 @@
-package com.itschool.inquirer.security.bean;
+package com.itschool.inquirer.bean.security;
 
 import static com.itschool.inquirer.util.StringUtils.isNullOrEmpty;
 
@@ -12,12 +12,14 @@ import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.RelationshipManager;
 import org.picketlink.idm.model.Account;
 import org.picketlink.idm.model.IdentityType;
+import org.picketlink.idm.model.basic.GroupRole;
 import org.picketlink.idm.query.IdentityQuery;
 import org.picketlink.idm.query.IdentityQueryBuilder;
 import org.picketlink.idm.query.RelationshipQuery;
 
 import com.itschool.inquirer.model.security.Grant;
 import com.itschool.inquirer.model.security.Role;
+import com.itschool.inquirer.model.security.User;
 
 @Stateless
 public class RoleManager {	
@@ -88,6 +90,17 @@ public class RoleManager {
             relationshipManager.remove(grant);
         }
         
+    }
+	
+	public boolean hasRole(User user, String rolename) {
+        Role storedRole = getRoleByName(rolename);
+        
+        RelationshipQuery<Grant> query = relationshipManager.createRelationshipQuery(Grant.class);
+
+        query.setParameter(Grant.ASSIGNEE, user);
+        query.setParameter(GroupRole.ROLE, storedRole);
+
+        return !query.getResultList().isEmpty();
     }
 
 }

@@ -5,11 +5,11 @@ function LoginCtrl($scope, LoginResource, SecurityService, $location, $rootScope
     $scope.login = function() {
         if ($scope.newUser.userId != undefined && $scope.newUser.password != undefined) {
             LoginResource($scope.newUser).login($scope.newUser,
-                function (data) {
-            		var token = data.authToken;
+                function (response) {
+            		var session = response.entity;
             		
-            		if(token != null && token != '' && token != 'undefined') {
-	                    SecurityService.initSession(data);
+            		if(session != null && session != '' && session != 'undefined') {
+	                    SecurityService.initSession(session);
 	                    $location.path( "/home" );
 	                    $scope.newUser = {};
             		}
@@ -24,21 +24,17 @@ function LoginCtrl($scope, LoginResource, SecurityService, $location, $rootScope
 
 }
 
-function LogoutCtrl($scope, LogoutResource) {
+function LogoutCtrl($scope, LogoutResource, $location) {
     $scope.newUser = {};
 
     $scope.logout = function() {    	
     	LogoutResource.logout();
+    	$location.path( "/login" );
     };
 }
 
 function SignupCtrl($scope, $http, RegistrationResource, $q, $location, $timeout) {
     $scope.register = function() {
-        if($scope.newUser.password != $scope.newUser.passwordConfirmation) {
-            $scope.errors = {passwordConfirmation : "Password Mismatch !!!"};
-            return;
-        }
-
         RegistrationResource.save($scope.newUser, function(data) {
             $location.path("/successfulRegistration");
         });
@@ -46,11 +42,9 @@ function SignupCtrl($scope, $http, RegistrationResource, $q, $location, $timeout
 }
 
 function ActivationCtrl($scope, $routeParams, RegistrationResource, SecurityService, $location) {
-    var ac = $routeParams.activationCode;
     $scope.activate = function() {
-        RegistrationResource.activation(JSON.stringify(ac), function(data) {
-            SecurityService.initSession(data);
-            $location.path( "/login" );
+        RegistrationResource.activate($routeParams.activationCode, function(response) {
+        	$location.path( "/login" );          
         }, function(result) {
             $location.path( "/invalidActivationCode" );
         });
@@ -94,75 +88,67 @@ angular.module('SecurityModule', ['ngResource', 'ngRoute']).config(
 	    } ])
 	    .factory('LoginResource', function($resource) {
 	        return function(newUser) {
-	            return $resource('rest/private/:dest', {}, {
-	            login: {method: 'POST', params: {dest:"authc"}, headers:{"Authorization": "Basic " + btoa(newUser.userId + ":" + newUser.password), "X-Requested-With": "XMLHttpRequest"} },
+	            return $resource('rest/:dest', {}, {
+	            login: {method: 'POST', params: {dest:"login"}, headers:{"Authorization": "Basic " + btoa(newUser.userId + ":" + newUser.password)} },
 	        });
 	    }})
 	    .factory('LogoutResource', function($resource) {
-	        return $resource('rest/private/:dest', {}, {
+	        return $resource('rest/:dest', {}, {
 	            logout: {method: 'POST', params: {dest:"logout"}}
 	        });
 	        })
 	    .factory('AdminResource', function($resource) {
-	        return $resource('rest/private/account/:dest', {}, {
-	            enableAccount: {method: 'POST', params: {dest:"enableAccount"}},
-	            disableAccount: {method: 'POST', params: {dest:"disableAccount"}}
+	        return $resource('rest/admin/user/:id :dest', {id: "@id"}, {
+	        	getUser: {method: 'GET', params: {dest: ""}},
+	        	userSave: {method: 'PUT', params: {dest: ""}},
+	        	deleteSave: {method: 'DELETE', params: {dest: ""}},
+	        	changePassword: {method: 'POST', params: {dest: "password"}},
+	            userEnable: {method: 'POST', params: {dest: "enable"}},
+	            userDisable: {method: 'POST', params: {dest: "disable"}}
 	        });
 	    })
 	    .factory('UsersResource', function($resource) {
 	        return $resource('rest/private/person/:dest', {}, {});
 	    })
 	    .factory('RegistrationResource', function($resource) {
-	        return $resource('rest/register/:dest', {}, {
-	            activation: {method: 'POST', params: {dest:"activation"}}
+	        return $resource('rest/registration/:dest', {}, {
+	            save: {method: 'POST', params: {dest:""}},
+	            activate: {method: 'POST', params: {dest:"activate"}},
+	            restorePassword: {method: 'POST', params: {dest:"password/restore"}}
 	        });
 	    })
 	    .factory('SecurityService', function($rootScope) {
 
 	        var SecurityService = function() {
             
-	            this.token = undefined;
+	            this.sid = undefined;
 
-	            this.initSession = function(response) {
+	            this.initSession = function(session) {
 	                console.log("[INFO] Initializing user session.");
-	                console.log("[INFO] Token is :" + response.authToken);
-	                console.log("[INFO] Token Stored in session storage.");
-	                // persist token, user id to the storage
-	                sessionStorage.setItem('token', response.authToken);
-	                this.token = response;
+	                console.log("[INFO] SID is :" + session.id);
+	                // persist sid, user id to the storage
+	                sessionStorage.setItem('sid', session.id);
+	                this.sid = session.id;
 	            };
 
 	            this.endSession = function() {
 	                console.log("[INFO] Ending User Session.");
-	                sessionStorage.removeItem('token');
-	                this.token = undefined;
-	                LogoutCtrl.logout();
-	                console.log("[INFO] Token removed from session storage.");
+	                sessionStorage.removeItem('sid');
+	                this.sid = undefined;
+	                console.log("[INFO] SID removed from session storage.");	                
 	            };
 
-	            this.getToken = function() {
-	                return sessionStorage.getItem('token');
+	            this.getSid = function() {
+	                return sessionStorage.getItem('sid');
 	            };
 
 	            this.secureRequest = function(requestConfig) {
-	                var token = this.getToken();
+	                var sid = this.getSid();
 
-	                if(token != null && token != '' && token != 'undefined') {
-	                    console.log("[INFO] Securing request.");
-	                    console.log("[INFO] Setting x-session-token header: " + token);
-	                    requestConfig.headers['Authorization'] = 'Token ' + token;
+	                if(sid != null && sid != '' && sid != 'undefined') {
+	                    requestConfig.headers['Authorization'] = sid;
 	                }
 	            };
-	            
-	            this.UID = function() {
-	            	if(this.token.authId)
-	            		return this.token.authId;
-	            }
-	            
-	            this.inRole = function(role) {
-	            	if(this.token.authId)
-	            		return this.token.authPermission === role;
-	            }
 	        };
 
 	        return new SecurityService();

@@ -1,4 +1,4 @@
-package com.itschool.inquirer.security.bean;
+package com.itschool.inquirer.bean.security;
 
 import static com.itschool.inquirer.util.StringUtils.isNullOrEmpty;
 
@@ -20,8 +20,10 @@ import org.picketlink.idm.query.IdentityQueryBuilder;
 
 import com.itschool.inquirer.Constants;
 import com.itschool.inquirer.model.Email;
+import com.itschool.inquirer.model.Filter;
 import com.itschool.inquirer.model.security.User;
 
+import static com.itschool.inquirer.model.AppRoles.ADMIN;
 import static com.itschool.inquirer.model.AppRoles.USER;
 
 @Stateless
@@ -147,7 +149,7 @@ public class UserManager {
 		sb.append(u.getProfile().getLastname());
 		sb.append("!<br/><br/>You have registered on Inquirer Service. For access to full functionality you must activate your account.<br/><br/>Please, click <a href=\"");
 		sb.append(Constants.ROOT_PATH);
-		sb.append("/rs/activate/");
+		sb.append("/#/activate/");
 		sb.append(activationCode);
 		sb.append("\">activation link</a><br/><br/>--------------------------------------------------<br/><br/>Best regards, MyWay Team.");
 
@@ -199,6 +201,9 @@ public class UserManager {
 
 		if (entity != null) {
 			if(isNullOrEmpty(entity.getId())) {
+				if(getUserByLogin(entity.getEmail()) != null)
+					throw new IdentityManagementException("This email is already exist.");
+				
 				entity.setActivationCode(DatatypeConverter.printBase64Binary(UUID.randomUUID()
 						.toString().getBytes()));
 				entity.setEnabled(false);
@@ -222,6 +227,52 @@ public class UserManager {
 
 		identityManager.remove(identityManager.lookupIdentityById(User.class, id));
 		
+	}
+
+	public void enableAccount(String id) throws Exception {
+        User user = identityManager.lookupIdentityById(User.class, id);
+
+        if (user == null) {
+        	throw new Exception("Invalid account.");
+        }
+
+        if(user.isEnabled()) {
+        	throw new Exception("Account is already enabled.");
+        }
+
+        if (roleManager.hasRole(user, ADMIN)) {
+            throw new IllegalArgumentException("Administrators can not be enabled.");
+        }
+        
+        user.setEnabled(true);
+        identityManager.update(user);
+		
+	}
+
+	public void disableAccount(String id) throws Exception {
+        User user = identityManager.lookupIdentityById(User.class, id);
+
+        if (user == null) {
+        	throw new Exception("Invalid account.");
+        }
+
+        if(user.isEnabled()) {
+        	throw new Exception("Account is already enabled.");
+        }
+
+        if (roleManager.hasRole(user, ADMIN)) {
+            throw new IllegalArgumentException("Administrators can not be enabled.");
+        }
+        
+        user.setEnabled(false);
+        identityManager.update(user);
+		
+	}
+
+	public Object getList(int pageSize, int pageNumber, String orderBy,
+			boolean order, Filter[] filters) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

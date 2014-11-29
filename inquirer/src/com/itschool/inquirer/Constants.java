@@ -13,6 +13,8 @@ public class Constants {
 	public static final String ROOT_PATH = "https://localhost:8443/inquirer";
 
 	public static final int MAX_SESSION_AGE = 6;
+
+	public static final String sid = "Authorization";
 	
 	public enum QuestionType { PARENT, SINGLEANSWER, MULTIANSWER, CUSTOMANSWER }
 

@@ -13,11 +13,11 @@ import org.picketlink.idm.model.Partition;
 import org.picketlink.idm.model.basic.Realm;
 
 import com.itschool.inquirer.Constants;
+import com.itschool.inquirer.bean.security.RoleManager;
+import com.itschool.inquirer.bean.security.UserManager;
 import com.itschool.inquirer.model.entity.Profile;
 import com.itschool.inquirer.model.security.Role;
 import com.itschool.inquirer.model.security.User;
-import com.itschool.inquirer.security.bean.RoleManager;
-import com.itschool.inquirer.security.bean.UserManager;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -50,7 +50,7 @@ public class SecurityInitializer {
     public void configureDefaultPartition() {
     	createDefaultPartition();
         createDefaultRoles();
-        createAdminAccount();
+		createAdminAccount();
     }
     
     public void createDefaultPartition() {
@@ -126,8 +126,7 @@ public class SecurityInitializer {
         profile.setLastname("Administrator");
         admin.setProfile(profile);
 
-        userManager.save(admin);
-        
+        userManager.save(admin);    
         roleManager.grantRole(admin.getId(), ADMIN);
     }
 }

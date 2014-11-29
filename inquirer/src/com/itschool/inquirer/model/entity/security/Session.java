@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.itschool.inquirer.Constants;
 
 @Entity
-@JsonIgnoreProperties({"owner"})
+@JsonIgnoreProperties(ignoreUnknown = true, value = {"owner"})
 public class Session {
 	
 	@Id

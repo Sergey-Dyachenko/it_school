@@ -12,7 +12,7 @@ import javax.persistence.ManyToMany;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@JsonIgnoreProperties({ "inquirers" })
+@JsonIgnoreProperties(ignoreUnknown = true, value = { "inquirers" })
 public class Category {
 	
 	@Id

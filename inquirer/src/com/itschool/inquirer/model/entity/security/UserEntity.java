@@ -11,12 +11,14 @@ import org.picketlink.idm.jpa.annotations.AttributeValue;
 import org.picketlink.idm.jpa.annotations.entity.IdentityManaged;
 import org.picketlink.idm.jpa.model.sample.simple.IdentityTypeEntity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.itschool.inquirer.model.entity.Profile;
 import com.itschool.inquirer.model.security.User;
 
 @IdentityManaged(User.class)
 @Entity
 @Table(name = "user")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserEntity extends IdentityTypeEntity {
 
     /**
