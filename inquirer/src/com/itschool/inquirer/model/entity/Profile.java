@@ -5,10 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 @Entity
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Profile {
 
 	@Id
@@ -17,8 +14,6 @@ public class Profile {
 
 	@Column(nullable = false)
 	private String firstname;
-
-	private String surname;
 
 	@Column(nullable = false)
 	private String lastname;
@@ -41,14 +36,6 @@ public class Profile {
 
 	public void setFirstname(String firstname) {
 		this.firstname = firstname;
-	}
-
-	public String getSurname() {
-		return surname;
-	}
-
-	public void setSurname(String surname) {
-		this.surname = surname;
 	}
 
 	public String getLastname() {

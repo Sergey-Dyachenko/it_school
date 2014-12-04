@@ -3,7 +3,6 @@ package com.itschool.inquirer.bean.security;
 import static com.itschool.inquirer.util.StringUtils.isNullOrEmpty;
 
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 import javax.ejb.Stateless;
@@ -31,7 +30,7 @@ public class UserManager {
 
 	@Inject
 	private IdentityManager identityManager;
-	
+
 	@Inject
 	private RoleManager roleManager;
 
@@ -39,8 +38,11 @@ public class UserManager {
 	@Any
 	private Event<Email> event;
 
-	/* (non-Javadoc)
-	 * @see edu.oasa.portal.ejb.security.UserManager#getUserByLogin(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.oasa.portal.ejb.security.UserManager#getUserByLogin(java.lang.String)
 	 */
 	public User getUserByLogin(String login) throws IdentityManagementException {
 
@@ -50,8 +52,9 @@ public class UserManager {
 
 		IdentityQueryBuilder queryBuilder = identityManager.getQueryBuilder();
 		@SuppressWarnings("unchecked")
-		IdentityQuery<User> query = queryBuilder.createIdentityQuery(
-				User.class).where(queryBuilder.equal(User.LOGIN, login));
+		IdentityQuery<User> query = queryBuilder
+				.createIdentityQuery(User.class).where(
+						queryBuilder.equal(User.LOGIN, login));
 
 		List<User> agents = query.getResultList();
 
@@ -63,43 +66,40 @@ public class UserManager {
 			throw new IdentityManagementException(
 					"Error - multiple User objects found with same login name");
 		}
-		
+
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.oasa.portal.ejb.security.UserManager#changePassword(java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.oasa.portal.ejb.security.UserManager#changePassword(java.lang.String,
+	 * java.lang.String)
 	 */
 	public void changePassword(String id, String newPassword) {
 
 		User a = get(id);
 
 		if (a != null) {
-			Password p = new Password(newPassword);
-			identityManager.updateCredential(a, p);
-			sendPassword(a, p);
+			if(!isNullOrEmpty(newPassword) && newPassword.length() >= Constants.MIN_PASS_LENGTH) {
+				identityManager.updateCredential(a, new Password(newPassword));			
+				a.setActivationCode(DatatypeConverter.printBase64Binary(UUID.randomUUID()
+						.toString().getBytes()));
+				a.setEnabled(false);
+				save(a);
+				sendActivationCode(a, a.getActivationCode());
+			} else
+				throw new IdentityManagementException("Password is very simple.");			
 		} else
 			throw new IdentityManagementException("Change password failed!!!");
 
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.oasa.portal.ejb.security.UserManager#restorePassword(java.lang.String)
-	 */
-	public void restorePassword(String email) {
-
-		User a = getUserByLogin(email);
-
-		if (a != null) {
-			Password p = new Password(generatePassword());
-			identityManager.updateCredential(a, p);
-			sendPassword(a, p);
-		} else
-			throw new IdentityManagementException("Restore password failed!!!");
-
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.oasa.portal.ejb.security.UserManager#activateUser(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.oasa.portal.ejb.security.UserManager#activateUser(java.lang.String)
 	 */
 	public void activateUser(String activationCode) {
 
@@ -109,9 +109,6 @@ public class UserManager {
 			if (a.getActivationCode().equals(activationCode)) {
 				a.setEnabled(true);
 				save(a);
-				Password p = new Password(generatePassword());
-				identityManager.updateCredential(a, p);
-				sendPassword(a, p);
 			} else
 				throw new IdentityManagementException("Activation failed!!!");
 		} else
@@ -158,35 +155,6 @@ public class UserManager {
 		event.fire(email);
 	}
 
-	private void sendPassword(User u, Password p) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("Dear, ");
-		sb.append(u.getProfile().getFirstname());
-		sb.append(" ");
-		sb.append(u.getProfile().getLastname());
-		sb.append("!<br/><br/>Your account has been activated successfuly.<br/><br/>Your login: ");
-		sb.append(u.getEmail());
-		sb.append("<br/>Your password: ");
-		sb.append(new String(p.getValue()));
-		sb.append("<br/><br/>--------------------------------------------------<br/><br/>Best regards, MyWay Team.");
-
-		Email email = new Email("Inquirer Service account activation",
-				sb.toString(), u.getEmail());
-		event.fire(email);
-	}
-
-	private String generatePassword() {
-		char[] chars = "0123456789QWERTYUIOPASDFGHJKLZXCVBNMabcdefghijklmnopqrstuvwxyz@#$%^&?!*_-+=/"
-				.toCharArray();
-		StringBuilder sb = new StringBuilder();
-		Random random = new Random();
-		for (int i = 0; i < 8; i++) {
-			char c = chars[random.nextInt(chars.length)];
-			sb.append(c);
-		}
-		return sb.toString();
-	}
-
 	public User get(String id) {
 
 		if (isNullOrEmpty(id)) {
@@ -194,28 +162,24 @@ public class UserManager {
 		}
 
 		return identityManager.lookupIdentityById(User.class, id);
-		
+
 	}
 
 	public User save(User entity) {
 
 		if (entity != null) {
-			if(isNullOrEmpty(entity.getId())) {
-				if(getUserByLogin(entity.getEmail()) != null)
-					throw new IdentityManagementException("This email is already exist.");
-				
-				entity.setActivationCode(DatatypeConverter.printBase64Binary(UUID.randomUUID()
-						.toString().getBytes()));
-				entity.setEnabled(false);
+			if (isNullOrEmpty(entity.getId())) {
+				if (getUserByLogin(entity.getEmail()) != null)
+					throw new IdentityManagementException(
+							"This email is already exist.");
+
 				identityManager.add(entity);
 				roleManager.grantRole(entity.getId(), USER);
-
-				sendActivationCode(entity, entity.getActivationCode());
-			} else			
+			} else
 				identityManager.update(entity);
 		} else
 			throw new IdentityManagementException("Update profile failed!!!");
-		
+
 		return entity;
 	}
 
@@ -225,48 +189,51 @@ public class UserManager {
 			throw new NullPointerException("Error - id is null...");
 		}
 
-		identityManager.remove(identityManager.lookupIdentityById(User.class, id));
-		
+		identityManager.remove(identityManager.lookupIdentityById(User.class,
+				id));
+
 	}
 
 	public void enableAccount(String id) throws Exception {
-        User user = identityManager.lookupIdentityById(User.class, id);
+		User user = identityManager.lookupIdentityById(User.class, id);
 
-        if (user == null) {
-        	throw new Exception("Invalid account.");
-        }
+		if (user == null) {
+			throw new Exception("Invalid account.");
+		}
 
-        if(user.isEnabled()) {
-        	throw new Exception("Account is already enabled.");
-        }
+		if (user.isEnabled()) {
+			throw new Exception("Account is already enabled.");
+		}
 
-        if (roleManager.hasRole(user, ADMIN)) {
-            throw new IllegalArgumentException("Administrators can not be enabled.");
-        }
-        
-        user.setEnabled(true);
-        identityManager.update(user);
-		
+		if (roleManager.hasRole(user, ADMIN)) {
+			throw new IllegalArgumentException(
+					"Administrators can not be enabled.");
+		}
+
+		user.setEnabled(true);
+		identityManager.update(user);
+
 	}
 
 	public void disableAccount(String id) throws Exception {
-        User user = identityManager.lookupIdentityById(User.class, id);
+		User user = identityManager.lookupIdentityById(User.class, id);
 
-        if (user == null) {
-        	throw new Exception("Invalid account.");
-        }
+		if (user == null) {
+			throw new Exception("Invalid account.");
+		}
 
-        if(user.isEnabled()) {
-        	throw new Exception("Account is already enabled.");
-        }
+		if (user.isEnabled()) {
+			throw new Exception("Account is already enabled.");
+		}
 
-        if (roleManager.hasRole(user, ADMIN)) {
-            throw new IllegalArgumentException("Administrators can not be enabled.");
-        }
-        
-        user.setEnabled(false);
-        identityManager.update(user);
-		
+		if (roleManager.hasRole(user, ADMIN)) {
+			throw new IllegalArgumentException(
+					"Administrators can not be enabled.");
+		}
+
+		user.setEnabled(false);
+		identityManager.update(user);
+
 	}
 
 	public Object getList(int pageSize, int pageNumber, String orderBy,

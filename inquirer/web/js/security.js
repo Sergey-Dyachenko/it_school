@@ -35,8 +35,27 @@ function LogoutCtrl($scope, LogoutResource, $location) {
 
 function SignupCtrl($scope, $http, RegistrationResource, $q, $location, $timeout) {
     $scope.register = function() {
+        if($scope.newUser.password != $scope.newUser.passwordConfirmation) {
+            $scope.errors = {passwordConfirmation : "Password Mismatch !!!"};
+            return;
+        }
+
         RegistrationResource.save($scope.newUser, function(data) {
             $location.path("/successfulRegistration");
+        });
+    };
+}
+
+function RestorePaswordCtrl($scope, $http, RegistrationResource, $q, $location, $timeout) {
+    $scope.restorePassword = function() {
+        if($scope.restorePassUser.password != $scope.restorePassUser.passwordConfirmation) {
+            $scope.errors = {passwordConfirmation : "Password Mismatch !!!"};
+            return;
+        }
+
+        RegistrationResource.restorePassword({email: $scope.restorePassUser.email, newPass: $scope.restorePassUser.password}, function(data) {
+            $location.path("/successfulRegistration");
+            $scope.restorePassUser = undefined;
         });
     };
 }
@@ -65,6 +84,12 @@ angular.module('SecurityModule', ['ngResource', 'ngRoute']).config(
 	        }).when('/signup', {
 	            templateUrl : 'partials/signup.html',
 	            controller : 'SignupCtrl',
+	            access : {
+	                isFree : true
+	            }
+	        }).when('/restorePassword', {
+	            templateUrl : 'partials/restorePassword.html',
+	            controller : 'RestorePaswordCtrl',
 	            access : {
 	                isFree : true
 	            }
@@ -98,10 +123,10 @@ angular.module('SecurityModule', ['ngResource', 'ngRoute']).config(
 	        });
 	        })
 	    .factory('AdminResource', function($resource) {
-	        return $resource('rest/admin/user/:id :dest', {id: "@id"}, {
-	        	getUser: {method: 'GET', params: {dest: ""}},
-	        	userSave: {method: 'PUT', params: {dest: ""}},
-	        	deleteSave: {method: 'DELETE', params: {dest: ""}},
+	        return $resource('rest/admin/user/:id/:dest', {id: "@id"}, {
+	        	getUser: {method: 'GET'},
+	        	userSave: {method: 'PUT'},
+	        	deleteSave: {method: 'DELETE'},
 	        	changePassword: {method: 'POST', params: {dest: "password"}},
 	            userEnable: {method: 'POST', params: {dest: "enable"}},
 	            userDisable: {method: 'POST', params: {dest: "disable"}}
@@ -111,10 +136,10 @@ angular.module('SecurityModule', ['ngResource', 'ngRoute']).config(
 	        return $resource('rest/private/person/:dest', {}, {});
 	    })
 	    .factory('RegistrationResource', function($resource) {
-	        return $resource('rest/registration/:dest', {}, {
-	            save: {method: 'POST', params: {dest:""}},
+	        return $resource('rest/registration/:dest/:email', {}, {
+	            save: {method: 'POST'},
 	            activate: {method: 'POST', params: {dest:"activate"}},
-	            restorePassword: {method: 'POST', params: {dest:"password/restore"}}
+	            restorePassword: {method: 'POST', params: {dest: "password", email: "@email", newPass: "@newPass"}}
 	        });
 	    })
 	    .factory('SecurityService', function($rootScope) {
@@ -126,7 +151,6 @@ angular.module('SecurityModule', ['ngResource', 'ngRoute']).config(
 	            this.initSession = function(session) {
 	                console.log("[INFO] Initializing user session.");
 	                console.log("[INFO] SID is :" + session.id);
-	                // persist sid, user id to the storage
 	                sessionStorage.setItem('sid', session.id);
 	                this.sid = session.id;
 	            };
@@ -156,4 +180,5 @@ angular.module('SecurityModule', ['ngResource', 'ngRoute']).config(
 	    .controller('LoginCtrl', LoginCtrl)
 	    .controller('LogoutCtrl', LogoutCtrl)
 	    .controller('SignupCtrl', SignupCtrl)
-	    .controller('ActivationCtrl', ActivationCtrl);
+	    .controller('ActivationCtrl', ActivationCtrl)
+	    .controller('RestorePaswordCtrl', RestorePaswordCtrl);
