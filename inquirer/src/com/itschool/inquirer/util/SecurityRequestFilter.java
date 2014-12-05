@@ -22,7 +22,6 @@ import static com.itschool.inquirer.Constants.sid;
 import static com.itschool.inquirer.util.StringUtils.isNullOrEmpty;
 
 import com.itschool.inquirer.bean.security.SessionManager;
-import com.itschool.inquirer.bean.security.RoleManager;
 import com.itschool.inquirer.model.security.User;
 
 @Provider
@@ -39,9 +38,6 @@ public class SecurityRequestFilter implements ContainerRequestFilter {
     
     @Inject
     private SessionManager sessionManager;
-    
-    @Inject
-    private RoleManager roleManager;
 	
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -59,7 +55,7 @@ public class SecurityRequestFilter implements ContainerRequestFilter {
 						User u = (User) identity.getAccount();
 						
 						for(String r : rolesAllowed) {
-							if(roleManager.hasRole(u, r))
+							if(u.getRole().equals(r))
 								return;
 						}
 						throw new AccessDeniedException("Access denied!");

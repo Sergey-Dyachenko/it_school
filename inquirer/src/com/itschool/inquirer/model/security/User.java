@@ -39,6 +39,9 @@ public class User extends AbstractIdentityType implements Account {
 
     @AttributeProperty
     private String activationCode;
+    
+    @AttributeProperty
+    private String role;
 
 	@AttributeValue
 	private Profile profile;
@@ -65,6 +68,14 @@ public class User extends AbstractIdentityType implements Account {
 
 	public void setActivationCode(String activationCode) {
 		this.activationCode = activationCode;
+	}
+	
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	public Profile getProfile() {

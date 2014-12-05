@@ -54,15 +54,11 @@ public class SecurityConfiguration {
 				.stores()
 				.jpa()
 				// defines each identity type
-				.supportType(User.class, Role.class, Realm.class)
-				// defines each relationship type
-				.supportGlobalRelationship(Grant.class)
+				.supportType(User.class, Realm.class)
 				// we need to support credentials
 				.supportCredentials(true)
 				// defines the entities
-				.mappedEntity(GrantEntity.class, RoleEntity.class, UserEntity.class,
-						PasswordCredentialEntity.class, RelationshipEntity.class, 
-						RelationshipIdentityEntity.class, PartitionTypeEntity.class)
+				.mappedEntity(UserEntity.class, PasswordCredentialEntity.class, PartitionTypeEntity.class)
 				.addContextInitializer(this.contextInitializer)
 				.addCredentialHandler(SessionCredentialHandler.class);
 

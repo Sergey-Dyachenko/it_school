@@ -5,7 +5,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 
-import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.PartitionManager;
 import org.picketlink.idm.config.SecurityConfigurationException;
 import org.picketlink.idm.model.Attribute;
@@ -13,10 +12,8 @@ import org.picketlink.idm.model.Partition;
 import org.picketlink.idm.model.basic.Realm;
 
 import com.itschool.inquirer.Constants;
-import com.itschool.inquirer.bean.security.RoleManager;
 import com.itschool.inquirer.bean.security.UserManager;
 import com.itschool.inquirer.model.entity.Profile;
-import com.itschool.inquirer.model.security.Role;
 import com.itschool.inquirer.model.security.User;
 
 import javax.annotation.PostConstruct;
@@ -26,7 +23,6 @@ import javax.faces.bean.ApplicationScoped;
 import javax.inject.Inject;
 
 import static com.itschool.inquirer.model.AppRoles.ADMIN;
-import static com.itschool.inquirer.model.AppRoles.USER;
 
 @Singleton
 @Startup
@@ -39,9 +35,6 @@ public class SecurityInitializer {
     
     @Inject
     private UserManager userManager;
-    
-    @Inject
-    private RoleManager roleManager;
 
     @Inject
     private PartitionManager partitionManager;    
@@ -49,7 +42,6 @@ public class SecurityInitializer {
     @PostConstruct
     public void configureDefaultPartition() {
     	createDefaultPartition();
-        createDefaultRoles();
 		createAdminAccount();
     }
     
@@ -70,24 +62,6 @@ public class SecurityInitializer {
         } catch (Exception e) {
             throw new SecurityConfigurationException("Could not create default partition.", e);
         }
-    }
-
-    private void createDefaultRoles() {
-        IdentityManager identityManager = partitionManager.createIdentityManager();
-
-        createRole(ADMIN, identityManager);
-        createRole(USER, identityManager);
-    }
-
-    private Role createRole(String roleName, IdentityManager identityManager) {
-        Role role = roleManager.getRoleByName(roleName);
-
-        if (role == null) {
-            role = new Role(roleName);
-            identityManager.add(role);
-        }
-
-        return role;
     }
 
     private byte[] getPrivateKey() throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
@@ -125,10 +99,10 @@ public class SecurityInitializer {
         profile.setFirstname("Almight");
         profile.setLastname("Administrator");
         admin.setProfile(profile);
+        admin.setRole(ADMIN);
 
         userManager.save(admin);  
         userManager.changePassword(admin.getId(), Constants.ADMIN_PASS);
-        roleManager.grantRole(admin.getId(), ADMIN);
         
     }
 }

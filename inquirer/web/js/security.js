@@ -6,6 +6,7 @@ function LoginCtrl($scope, LoginResource, SecurityService, $location, $rootScope
         if ($scope.newUser.userId != undefined && $scope.newUser.password != undefined) {
             LoginResource($scope.newUser).login($scope.newUser,
                 function (response) {
+            	
             		var session = response.entity;
             		
             		if(session != null && session != '' && session != 'undefined') {
@@ -41,20 +42,16 @@ function SignupCtrl($scope, $http, RegistrationResource, $q, $location, $timeout
         }
 
         RegistrationResource.save($scope.newUser, function(data) {
-            $location.path("/successfulRegistration");
+        	$scope.newUser = {};
+            $location.path("/info");
         });
     };
 }
 
 function RestorePaswordCtrl($scope, $http, RegistrationResource, $q, $location, $timeout) {
     $scope.restorePassword = function() {
-        if($scope.restorePassUser.password != $scope.restorePassUser.passwordConfirmation) {
-            $scope.errors = {passwordConfirmation : "Password Mismatch !!!"};
-            return;
-        }
-
-        RegistrationResource.restorePassword({email: $scope.restorePassUser.email, newPass: $scope.restorePassUser.password}, function(data) {
-            $location.path("/successfulRegistration");
+        RegistrationResource.restorePassword({email: $scope.restorePassUser.email}, function(data) {
+            $location.path("/info");
             $scope.restorePassUser = undefined;
         });
     };
@@ -99,8 +96,8 @@ angular.module('SecurityModule', ['ngResource', 'ngRoute']).config(
 	            access : {
 	                isFree: true
 	            }
-	        }).when('/successfulRegistration', {
-	            templateUrl : 'partials/successfulRegistration.html',
+	        }).when('/info', {
+	            templateUrl : 'partials/info.html',
 	            access : {
 	                isFree : true
 	            }
@@ -121,25 +118,15 @@ angular.module('SecurityModule', ['ngResource', 'ngRoute']).config(
 	        return $resource('rest/:dest', {}, {
 	            logout: {method: 'POST', params: {dest:"logout"}}
 	        });
-	        })
-	    .factory('AdminResource', function($resource) {
-	        return $resource('rest/admin/user/:id/:dest', {id: "@id"}, {
-	        	getUser: {method: 'GET'},
-	        	userSave: {method: 'PUT'},
-	        	deleteSave: {method: 'DELETE'},
-	        	changePassword: {method: 'POST', params: {dest: "password"}},
-	            userEnable: {method: 'POST', params: {dest: "enable"}},
-	            userDisable: {method: 'POST', params: {dest: "disable"}}
-	        });
 	    })
 	    .factory('UsersResource', function($resource) {
 	        return $resource('rest/private/person/:dest', {}, {});
 	    })
 	    .factory('RegistrationResource', function($resource) {
-	        return $resource('rest/registration/:dest/:email', {}, {
+	        return $resource('rest/registration/:dest', {}, {
 	            save: {method: 'POST'},
 	            activate: {method: 'POST', params: {dest:"activate"}},
-	            restorePassword: {method: 'POST', params: {dest: "password", email: "@email", newPass: "@newPass"}}
+	            restorePassword: {method: 'POST', params: {dest: "password", email: "@email"}}
 	        });
 	    })
 	    .factory('SecurityService', function($rootScope) {

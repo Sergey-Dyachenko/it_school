@@ -51,6 +51,8 @@ var appModule = angular.module('InquirerApp',
 		},
 
 		'response' : function(response) {
+			if (response.status === 200 && response.data && response.data.messages)
+				$rootScope.info = response.data.messages[0];
 		    return response || $q.when(response);
 		},
 		

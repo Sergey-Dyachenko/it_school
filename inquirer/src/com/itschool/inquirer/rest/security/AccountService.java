@@ -17,7 +17,7 @@ import org.picketlink.authorization.annotations.LoggedIn;
 import org.picketlink.authorization.annotations.RolesAllowed;
 
 import com.itschool.inquirer.bean.security.UserManager;
-import com.itschool.inquirer.model.Filter;
+import com.itschool.inquirer.model.DataPage;
 import com.itschool.inquirer.model.security.User;
 import com.itschool.inquirer.util.MessageBuilder;
 
@@ -28,22 +28,6 @@ public class AccountService {
 
     @Inject
     private UserManager userManager;
-    
-    @POST
-    @Path("/{id}/enable")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response enable(@PathParam("id") String id) throws Exception {
-        userManager.enableAccount(id);
-        return MessageBuilder.ok().message("Account is now enabled.").build();
-    }
-
-    @POST
-    @Path("/{id}/disable")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response disable(@PathParam("id") String id) throws Exception {
-    	userManager.disableAccount(id);
-        return MessageBuilder.ok().message("Account is now disabled.").build();
-    }
     
 	@POST
 	@Path("/{id}/password")
@@ -77,9 +61,8 @@ public class AccountService {
 	
 	@GET
     @Produces(MediaType.APPLICATION_JSON)
-	@Path("/list/{pageSize}/{pageNumber}/{orderBy}/{order}")
-	public Response getList(@PathParam("pageSize") int pageSize, @PathParam("pageNumber") int pageNumber,
-			@PathParam("orderBy") String orderBy, @PathParam("order") boolean order, Filter[] filters) {
-		return MessageBuilder.ok().message(userManager.getList(pageSize, pageNumber, orderBy, order, filters)).build();
+	@Path("/list")
+	public Response getList(DataPage dp) {
+		return MessageBuilder.ok().message(userManager.getList(dp)).build();
 	}
 }

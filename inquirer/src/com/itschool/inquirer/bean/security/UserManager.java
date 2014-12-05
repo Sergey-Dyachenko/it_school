@@ -3,6 +3,7 @@ package com.itschool.inquirer.bean.security;
 import static com.itschool.inquirer.util.StringUtils.isNullOrEmpty;
 
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import javax.ejb.Stateless;
@@ -18,11 +19,10 @@ import org.picketlink.idm.query.IdentityQuery;
 import org.picketlink.idm.query.IdentityQueryBuilder;
 
 import com.itschool.inquirer.Constants;
+import com.itschool.inquirer.model.DataPage;
 import com.itschool.inquirer.model.Email;
-import com.itschool.inquirer.model.Filter;
 import com.itschool.inquirer.model.security.User;
 
-import static com.itschool.inquirer.model.AppRoles.ADMIN;
 import static com.itschool.inquirer.model.AppRoles.USER;
 
 @Stateless
@@ -30,9 +30,6 @@ public class UserManager {
 
 	@Inject
 	private IdentityManager identityManager;
-
-	@Inject
-	private RoleManager roleManager;
 
 	@Inject
 	@Any
@@ -81,18 +78,68 @@ public class UserManager {
 		User a = get(id);
 
 		if (a != null) {
-			if(!isNullOrEmpty(newPassword) && newPassword.length() >= Constants.MIN_PASS_LENGTH) {
-				identityManager.updateCredential(a, new Password(newPassword));			
-				a.setActivationCode(DatatypeConverter.printBase64Binary(UUID.randomUUID()
-						.toString().getBytes()));
-				a.setEnabled(false);
-				save(a);
-				sendActivationCode(a, a.getActivationCode());
-			} else
-				throw new IdentityManagementException("Password is very simple.");			
+			identityManager.updateCredential(a, new Password(newPassword));
+			a.setActivationCode(DatatypeConverter.printBase64Binary(UUID
+					.randomUUID().toString().getBytes()));
+			a.setEnabled(false);
+			save(a);
+			sendActivationAndPassword(a, newPassword);
+
 		} else
 			throw new IdentityManagementException("Change password failed!!!");
 
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.oasa.portal.ejb.security.UserManager#restorePassword(java.lang.String
+	 * )
+	 */
+	public void restorePassword(String email) {
+
+		User a = getUserByLogin(email);
+
+		if (a != null) {
+			changePassword(a.getId(), generatePassword());
+		} else
+			throw new IdentityManagementException(
+					"Restore password failed! Email has not been found in our database!");
+
+	}
+
+	private void sendActivationAndPassword(User u, String p) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Dear, ");
+		sb.append(u.getProfile().getFirstname());
+		sb.append(" ");
+		sb.append(u.getProfile().getLastname());
+		sb.append("!<br/><br/>For access to full functionality you must activate your account.<br/><br/>Please, click <a href=\"");
+		sb.append(Constants.ROOT_PATH);
+		sb.append("/#/activate/");
+		sb.append(u.getActivationCode());
+		sb.append("\">activation link</a><br/><br/>After activation you can use the next credentials<br/><br/>Your login: ");
+		sb.append(u.getEmail());
+		sb.append("<br/>Your password: ");
+		sb.append(p);
+		sb.append("<br/><br/>--------------------------------------------------<br/><br/>Best regards, MyWay Team.");
+
+		Email email = new Email("Inquirer Service account activation",
+				sb.toString(), u.getEmail());
+		event.fire(email);
+	}
+
+	private String generatePassword() {
+		char[] chars = "0123456789QWERTYUIOPASDFGHJKLZXCVBNMabcdefghijklmnopqrstuvwxyz@#$%^&?!*_-+=/"
+				.toCharArray();
+		StringBuilder sb = new StringBuilder();
+		Random random = new Random();
+		for (int i = 0; i <= Constants.MIN_PASS_LENGTH; i++) {
+			char c = chars[random.nextInt(chars.length)];
+			sb.append(c);
+		}
+		return sb.toString();
 	}
 
 	/*
@@ -138,23 +185,6 @@ public class UserManager {
 		return null;
 	}
 
-	private void sendActivationCode(User u, String activationCode) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("Dear, ");
-		sb.append(u.getProfile().getFirstname());
-		sb.append(" ");
-		sb.append(u.getProfile().getLastname());
-		sb.append("!<br/><br/>You have registered on Inquirer Service. For access to full functionality you must activate your account.<br/><br/>Please, click <a href=\"");
-		sb.append(Constants.ROOT_PATH);
-		sb.append("/#/activate/");
-		sb.append(activationCode);
-		sb.append("\">activation link</a><br/><br/>--------------------------------------------------<br/><br/>Best regards, MyWay Team.");
-
-		Email email = new Email("Inquirer Service registration", sb.toString(),
-				u.getEmail());
-		event.fire(email);
-	}
-
 	public User get(String id) {
 
 		if (isNullOrEmpty(id)) {
@@ -172,9 +202,8 @@ public class UserManager {
 				if (getUserByLogin(entity.getEmail()) != null)
 					throw new IdentityManagementException(
 							"This email is already exist.");
-
+				entity.setRole(USER);
 				identityManager.add(entity);
-				roleManager.grantRole(entity.getId(), USER);
 			} else
 				identityManager.update(entity);
 		} else
@@ -194,50 +223,7 @@ public class UserManager {
 
 	}
 
-	public void enableAccount(String id) throws Exception {
-		User user = identityManager.lookupIdentityById(User.class, id);
-
-		if (user == null) {
-			throw new Exception("Invalid account.");
-		}
-
-		if (user.isEnabled()) {
-			throw new Exception("Account is already enabled.");
-		}
-
-		if (roleManager.hasRole(user, ADMIN)) {
-			throw new IllegalArgumentException(
-					"Administrators can not be enabled.");
-		}
-
-		user.setEnabled(true);
-		identityManager.update(user);
-
-	}
-
-	public void disableAccount(String id) throws Exception {
-		User user = identityManager.lookupIdentityById(User.class, id);
-
-		if (user == null) {
-			throw new Exception("Invalid account.");
-		}
-
-		if (user.isEnabled()) {
-			throw new Exception("Account is already enabled.");
-		}
-
-		if (roleManager.hasRole(user, ADMIN)) {
-			throw new IllegalArgumentException(
-					"Administrators can not be enabled.");
-		}
-
-		user.setEnabled(false);
-		identityManager.update(user);
-
-	}
-
-	public Object getList(int pageSize, int pageNumber, String orderBy,
-			boolean order, Filter[] filters) {
+	public DataPage getList(DataPage dp) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -10,6 +10,7 @@ import javax.ws.rs.core.Response;
 import org.picketlink.Identity;
 import org.picketlink.Identity.AuthenticationResult;
 import org.picketlink.credential.DefaultLoginCredentials;
+import org.picketlink.http.AccessDeniedException;
 import org.picketlink.idm.model.Account;
 
 import com.itschool.inquirer.bean.security.SessionManager;
@@ -40,13 +41,13 @@ public class AuthenticationService {
 				try {
 					return MessageBuilder.ok().message(sessionManager.open(account)).build();
 				} catch (Exception e) {
-					return MessageBuilder.badRequest().message(e.getMessage()).build();
+					throw new AccessDeniedException(e.getMessage());
 				}
 			} else
-				return MessageBuilder.authenticationRequired().message("Credentials are failed!").build();
+				throw new AccessDeniedException("Credentials are failed!");
 		}
 		
-		return MessageBuilder.authenticationRequired().message("User has been already logged in...").build();
+		throw new AccessDeniedException("User has been already logged in...");
 	}
 
 }
