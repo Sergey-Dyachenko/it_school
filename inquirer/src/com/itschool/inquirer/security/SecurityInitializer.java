@@ -101,8 +101,7 @@ public class SecurityInitializer {
         admin.setProfile(profile);
         admin.setRole(ADMIN);
 
-        userManager.save(admin);  
-        userManager.changePassword(admin.getId(), Constants.ADMIN_PASS);
+        userManager.changePassword(userManager.save(admin), Constants.ADMIN_PASS);
         
     }
 }

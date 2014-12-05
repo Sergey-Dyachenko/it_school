@@ -38,6 +38,9 @@ public class UserEntity extends IdentityTypeEntity {
     @AttributeValue
     private int failedLoginAttempts;
     
+    @AttributeValue
+    private String role;
+    
 	@OneToOne (cascade = {CascadeType.ALL})
 	@AttributeValue
 	private Profile profile;
@@ -83,6 +86,14 @@ public class UserEntity extends IdentityTypeEntity {
 
 	public void setFailedLoginAttempts(int failedLoginAttempts) {
 		this.failedLoginAttempts = failedLoginAttempts;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	public Profile getProfile() {

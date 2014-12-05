@@ -7,7 +7,6 @@ import org.picketlink.idm.model.annotation.AttributeProperty;
 import org.picketlink.idm.model.annotation.IdentityStereotype;
 import org.picketlink.idm.model.annotation.StereotypeProperty;
 import org.picketlink.idm.model.annotation.Unique;
-import org.picketlink.idm.query.AttributeParameter;
 import org.picketlink.idm.query.QueryParameter;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -25,7 +24,7 @@ public class User extends AbstractIdentityType implements Account {
     /**
      * <p>Can be used to query users by their activation code.</p>
      */
-    public static final AttributeParameter ACTIVATION_CODE = QUERY_ATTRIBUTE.byName("activationCode");
+    public static final QueryParameter ACTIVATION_CODE = QUERY_ATTRIBUTE.byName("activationCode");
 
     /**
      * <p>Can be used to query users by their login name.</p>

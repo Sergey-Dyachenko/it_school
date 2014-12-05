@@ -19,6 +19,8 @@ import com.itschool.inquirer.model.entity.Profile;
 import com.itschool.inquirer.model.security.User;
 import com.itschool.inquirer.util.MessageBuilder;
 
+import static com.itschool.inquirer.model.AppRoles.USER;
+
 @Path("/registration")
 public class RegistrationService {
 
@@ -36,10 +38,12 @@ public class RegistrationService {
 			Profile p = new Profile();
 			p.setFirstname(r.getFirstName());
 			p.setLastname(r.getLastName());
+			u.setRole(USER);
 			u.setProfile(p);
 
 			u = userManager.save(u);
-			userManager.changePassword(u.getId(), newPassword);
+			
+			userManager.changePassword(u, newPassword);
 		} else
 			throw new IdentityManagementException("Password is very simple.");
 		return MessageBuilder

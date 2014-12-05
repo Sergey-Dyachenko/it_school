@@ -3,6 +3,7 @@ package com.itschool.inquirer.bean.security;
 import static com.itschool.inquirer.util.StringUtils.isNullOrEmpty;
 
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.UUID;
 
@@ -15,15 +16,16 @@ import javax.xml.bind.DatatypeConverter;
 import org.picketlink.idm.IdentityManagementException;
 import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.credential.Password;
+import org.picketlink.idm.model.AttributedType.QUERY_ATTRIBUTE;
+import org.picketlink.idm.query.Condition;
 import org.picketlink.idm.query.IdentityQuery;
 import org.picketlink.idm.query.IdentityQueryBuilder;
+import org.picketlink.idm.query.Sort;
 
 import com.itschool.inquirer.Constants;
 import com.itschool.inquirer.model.DataPage;
 import com.itschool.inquirer.model.Email;
 import com.itschool.inquirer.model.security.User;
-
-import static com.itschool.inquirer.model.AppRoles.USER;
 
 @Stateless
 public class UserManager {
@@ -73,21 +75,14 @@ public class UserManager {
 	 * edu.oasa.portal.ejb.security.UserManager#changePassword(java.lang.String,
 	 * java.lang.String)
 	 */
-	public void changePassword(String id, String newPassword) {
+	public void changePassword(User u, String newPassword) {
+		identityManager.updateCredential(u, new Password(newPassword));
+		u.setActivationCode(DatatypeConverter.printBase64Binary(UUID
+				.randomUUID().toString().getBytes()));
+		u.setEnabled(false);
+		save(u);
 
-		User a = get(id);
-
-		if (a != null) {
-			identityManager.updateCredential(a, new Password(newPassword));
-			a.setActivationCode(DatatypeConverter.printBase64Binary(UUID
-					.randomUUID().toString().getBytes()));
-			a.setEnabled(false);
-			save(a);
-			sendActivationAndPassword(a, newPassword);
-
-		} else
-			throw new IdentityManagementException("Change password failed!!!");
-
+		sendActivationAndPassword(u, newPassword);
 	}
 
 	/*
@@ -102,7 +97,7 @@ public class UserManager {
 		User a = getUserByLogin(email);
 
 		if (a != null) {
-			changePassword(a.getId(), generatePassword());
+			changePassword(a, generatePassword());
 		} else
 			throw new IdentityManagementException(
 					"Restore password failed! Email has not been found in our database!");
@@ -202,7 +197,6 @@ public class UserManager {
 				if (getUserByLogin(entity.getEmail()) != null)
 					throw new IdentityManagementException(
 							"This email is already exist.");
-				entity.setRole(USER);
 				identityManager.add(entity);
 			} else
 				identityManager.update(entity);
@@ -224,8 +218,31 @@ public class UserManager {
 	}
 
 	public DataPage getList(DataPage dp) {
-		// TODO Auto-generated method stub
-		return null;
+
+		IdentityQueryBuilder builder = identityManager.getQueryBuilder();
+
+		IdentityQuery<User> query = builder.createIdentityQuery(User.class);
+
+		Condition[] cond = new Condition[dp.getFilter().size()];
+
+		int i = 0;
+		for (Entry<String, String> ent : dp.getFilter().entrySet()) {
+			cond[i] = builder.equal(QUERY_ATTRIBUTE.byName(ent.getKey()),
+					ent.getValue());
+			i++;
+		}
+
+		query.where(cond);
+		dp.setTotal(query.getResultCount());
+
+		query.sortBy(new Sort(QUERY_ATTRIBUTE.byName(dp.getSortBy()), dp
+				.isAsc()));
+		query.setOffset(dp.getOffset());
+		query.setLimit(dp.getSize());
+
+		dp.setData(query.getResultList());
+
+		return dp;
 	}
 
 }

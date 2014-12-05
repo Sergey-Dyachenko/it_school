@@ -11,7 +11,9 @@ public class DataPage {
 
 	private List<?> data;
 
-	private Map<String, Boolean> orderBy;
+	private String sortBy;
+	private boolean asc;
+	
 	private Map<String, String> filter;
 
 	public int getOffset() {
@@ -46,12 +48,20 @@ public class DataPage {
 		this.data = data;
 	}
 
-	public Map<String, Boolean> getOrderBy() {
-		return orderBy;
+	public String getSortBy() {
+		return sortBy;
 	}
 
-	public void setOrderBy(Map<String, Boolean> orderBy) {
-		this.orderBy = orderBy;
+	public void setSortBy(String sortBy) {
+		this.sortBy = sortBy;
+	}
+
+	public boolean isAsc() {
+		return asc;
+	}
+
+	public void setAsc(boolean asc) {
+		this.asc = asc;
 	}
 
 	public Map<String, String> getFilter() {

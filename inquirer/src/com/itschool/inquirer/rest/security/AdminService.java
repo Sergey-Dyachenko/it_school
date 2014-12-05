@@ -24,7 +24,7 @@ import com.itschool.inquirer.util.MessageBuilder;
 @LoggedIn
 @Path("/admin/user")
 @RolesAllowed(ADMIN)
-public class AccountService {
+public class AdminService {
 
     @Inject
     private UserManager userManager;
@@ -33,7 +33,7 @@ public class AccountService {
 	@Path("/{id}/password")
     @Produces(MediaType.APPLICATION_JSON)
 	public Response changePassword(@PathParam("id") String id, String newPassword) {
-		userManager.changePassword(id, newPassword);
+		userManager.changePassword(userManager.get(id), newPassword);
 		return MessageBuilder.ok().message("Password has been changed successfuly.").build();
 	}
 	

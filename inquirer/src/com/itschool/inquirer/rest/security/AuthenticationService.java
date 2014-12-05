@@ -49,5 +49,4 @@ public class AuthenticationService {
 		
 		throw new AccessDeniedException("User has been already logged in...");
 	}
-
 }
